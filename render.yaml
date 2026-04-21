@@ -17,7 +17,3 @@ services:
         value: file:/var/data/dgh.db
       - key: NODE_ENV
         value: production
-    disk:
-      name: dgh-data
-      mountPath: /var/data
-      sizeGB: 1
