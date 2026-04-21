@@ -1,0 +1,119 @@
+// Prisma schema for Daily Games Hub
+// Data models: Users, Groups, GroupMembers, Games, DailyPuzzles, Submissions
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  displayName   String
+  createdAt     DateTime       @default(now())
+  memberships   GroupMember[]
+  submissions   Submission[]
+}
+
+model Group {
+  id             String        @id @default(cuid())
+  name           String
+  inviteCode     String        @unique
+  createdAt      DateTime      @default(now())
+  createdByUserId String?
+  // JSON array of game IDs this group plays. Empty/null = all registered games.
+  selectedGames  String?
+  // "fixed" (default) = every day uses the full selection.
+  // "random"          = each day picks a random subset from the selection.
+  dailyMode      String        @default("fixed")
+  // Size of the random subset when dailyMode = "random".
+  dailyPoolSize  Int?
+  // Feature toggle — if true, members can form alliances.
+  alliancesEnabled Boolean     @default(false)
+  members        GroupMember[]
+  submissions    Submission[]
+  alliances      Alliance[]
+}
+
+model Alliance {
+  id        String   @id @default(cuid())
+  groupId   String
+  name      String
+  color     String   // css color token id, e.g. "rose", "emerald"
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  members   AllianceMember[]
+
+  @@unique([groupId, name])
+}
+
+model AllianceMember {
+  id         String   @id @default(cuid())
+  allianceId String
+  userId     String
+  joinedAt   DateTime @default(now())
+  alliance   Alliance @relation(fields: [allianceId], references: [id], onDelete: Cascade)
+
+  @@unique([allianceId, userId])
+  // A user can only be in one alliance per group.
+  // (Enforced in application code since we don't have groupId here.)
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  joinedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model Game {
+  id          String        @id  // matches the gameId registered in code (e.g. "emoji", "higher-lower", "blur")
+  name        String
+  description String
+  enabled     Boolean       @default(true)
+  submissions Submission[]
+}
+
+// Cache of generated puzzles for a date, so everyone in every group sees the same puzzle.
+model DailyPuzzle {
+  id        String   @id @default(cuid())
+  gameId    String
+  date      String   // YYYY-MM-DD in UTC
+  seed      String
+  // JSON blob holding the full puzzle (answer included — never sent raw to the client).
+  puzzle    String
+  createdAt DateTime @default(now())
+
+  @@unique([gameId, date])
+}
+
+// A single submission by a user for a game on a date, inside a group.
+// One submission per (user, game, date, group).
+model Submission {
+  id         String   @id @default(cuid())
+  userId     String
+  gameId     String
+  groupId    String
+  date       String   // YYYY-MM-DD
+  score      Int
+  maxScore   Int
+  timeTaken  Int      // milliseconds
+  metadata   String   // JSON blob: guesses, correct, etc.
+  createdAt  DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  game  Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId, groupId, date])
+  @@index([groupId, date])
+  @@index([userId, date])
+}

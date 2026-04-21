@@ -1,0 +1,23 @@
+# Render blueprint. Drop this at the repo root and Render will auto-detect it
+# when you connect the repo. See DEPLOY.md for step-by-step instructions.
+services:
+  - type: web
+    name: daily-games-hub
+    runtime: node
+    region: oregon               # change if you prefer another region
+    plan: free  
+    # If you want to try the free tier first, change plan to `free` and
+    # REMOVE the `disk:` block below. Data will reset on every deploy/restart.
+    buildCommand: npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        value: file:/var/data/dgh.db
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: dgh-data
+      mountPath: /var/data
+      sizeGB: 1

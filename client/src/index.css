@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: #0b1220;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(99, 102, 241, 0.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(236, 72, 153, 0.06), transparent 60%),
+      #f8fafc;
+    background-attachment: fixed;
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Buttons — semantic system */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition-all duration-200 ease-out
+           disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.97];
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white shadow-soft hover:bg-ink-soft hover:shadow-lift hover:-translate-y-px;
+  }
+  .btn-accent {
+    @apply btn bg-primary-600 text-white shadow-soft hover:bg-primary-700 hover:shadow-lift hover:-translate-y-px;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink ring-1 ring-slate-200 shadow-soft hover:bg-slate-50 hover:-translate-y-px;
+  }
+  .btn-ghost {
+    @apply btn text-slate-700 hover:bg-slate-100;
+  }
+  .btn-success {
+    @apply btn bg-success-600 text-white shadow-soft hover:bg-success-700;
+  }
+
+  /* Cards */
+  .card {
+    @apply rounded-2xl bg-white p-5 ring-1 ring-slate-200 shadow-soft;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lift;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full rounded-xl border-0 bg-slate-100 px-4 py-3 text-sm
+           placeholder:text-slate-400 transition
+           focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+  .input-lg {
+    @apply input px-5 py-4 text-lg text-center;
+  }
+
+  /* Chips & Badges */
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700;
+  }
+
+  /* Container */
+  .container-app {
+    @apply mx-auto w-full max-w-5xl px-4 sm:px-6;
+  }
+  .container-narrow {
+    @apply mx-auto w-full max-w-3xl px-4 sm:px-6;
+  }
+
+  /* Section spacing */
+  .section {
+    @apply py-6 sm:py-8;
+  }
+  .stack-y > * + * {
+    margin-top: 1.25rem;
+  }
+
+  /* Skeleton placeholder */
+  .skel {
+    background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+    background-size: 200% 100%;
+    @apply rounded-xl animate-shimmer;
+  }
+}

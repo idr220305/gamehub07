@@ -1,0 +1,25 @@
+{
+  "name": "daily-games-hub-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --watch src --exec node src/index.js",
+    "start": "node src/index.js",
+    "db:setup": "prisma generate && prisma db push --accept-data-loss && node src/seed.js && node src/pregenPuzzles.js 100",
+    "db:reset": "rm -f prisma/dev.db && prisma db push --accept-data-loss && node src/seed.js && node src/pregenPuzzles.js 100",
+    "db:migrate": "prisma generate && prisma db push && node src/pregenPuzzles.js 100",
+    "seed": "node src/seed.js",
+    "pregen": "node src/pregenPuzzles.js 100"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "nanoid": "^5.0.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "prisma": "^5.22.0"
+  }
+}
